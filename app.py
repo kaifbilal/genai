@@ -263,4 +263,4 @@ def lab15_4():
     return render_template('lab15/4.html')
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
