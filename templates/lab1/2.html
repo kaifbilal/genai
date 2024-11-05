@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Display Example</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
+</head>
+<body>
+    <h1>The Basics of Google Cloud Compute</h1>
+    <a href="https://www.cloudskillsboost.google/course_sessions/19266958/labs/461561" class="sky-blue-link">
+        <h2>Creating a Persistent Disk</h2>
+    </a>
+
+    <div class="code-example">
+        <p>Execute 1: Enter the value of zone displayed on the lab page, after clicking on start. For example: ZONE=us-central1-a</p>
+        <div class="code-block">
+            <button class="copy-button">Copy code</button>
+            <pre><code>ZONE=    # write zone from the code</code></pre>
+        </div>
+    </div>
+
+    <div class="code-example">
+        <p>Execute 2: Copy and paste this code in the terminal</p>
+        <div class="code-block">
+            <button class="copy-button">Copy code</button>
+            <pre><code>
+gcloud auth list && gcloud config list project && \
+export REGION="${ZONE%-*}"
+gcloud config set compute/region $REGION && \
+gcloud config set compute/zone $ZONE
+gcloud compute instances create gcelab \
+  --zone=$ZONE \
+  --machine-type=e2-standard-2 && \
+gcloud compute disks create mydisk \
+  --size=200GB \
+  --zone=$ZONE && \
+
+gcloud compute instances attach-disk gcelab \
+  --disk=mydisk \
+  --zone=$ZONE && \
+
+cat &gt; prepare_disk.sh &lt;&lt;'EOF_END'
+
+ls -l /dev/disk/by-id/
+
+sudo mkdir /mnt/mydisk
+
+sudo mkfs.ext4 -F -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/disk/by-id/scsi-0Google_PersistentDisk_persistent-disk-1
+
+sudo mount -o discard,defaults /dev/disk/by-id/scsi-0Google_PersistentDisk_persistent-disk-1 /mnt/mydisk
+
+EOF_END
+
+gcloud compute scp prepare_disk.sh gcelab:/tmp --project=$DEVSHELL_PROJECT_ID --zone=$ZONE --quiet
+
+gcloud compute ssh gcelab --project=$DEVSHELL_PROJECT_ID --zone=$ZONE --quiet --command="bash /tmp/prepare_disk.sh"</code></pre>
+        </div>
+    </div>
+
+</body>
+</html>

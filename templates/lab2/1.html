@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Display Example</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
+</head>
+<body>
+    <h1>Get Started with Cloud Storage</h1>
+    <a href="https://www.cloudskillsboost.google/course_templates/725/labs/461636" class="sky-blue-link"><h2>APIs Explorer: Cloud Storage </h2></a>
+
+    <div class="code-example">
+        <p>Execute 1: Copy Paste the code in terminal.</p>
+        <div class="code-block">
+            <button class="copy-button">Copy code</button>
+            <pre><code>
+gcloud auth list && gcloud config list project
+export PROJECT_ID=$(gcloud config get-value project)
+
+gsutil mb gs://$PROJECT_ID-bucket
+gsutil mb gs://$PROJECT_ID-bucket0
+
+curl -o demo-image1.png "https://cdn.qwiklabs.com/E4%2BSx10I0HBeOFPB15BFPzf9%2F%2FOK%2Btf7S0Mbn6aQ8fw%3D"
+curl -o demo-image2.png "https://cdn.qwiklabs.com/Hr8ohUSBSeAiMUJe1J998ydGcTu%2FrF4BUjZ2J%2BbiKps%3D"
+
+gsutil cp demo-image1.png gs://$PROJECT_ID-bucket/
+gsutil cp demo-image2.png gs://$PROJECT_ID-bucket/
+
+gsutil cp gs://$PROJECT_ID-bucket/demo-image1.png gs://$PROJECT_ID-bucket0/demo-image1-copy.png
+            </code></pre>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Display Example</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
+</head>
+<body>
+    <h1>The Basics of Google Cloud Compute</h1>
+    <a href="https://www.cloudskillsboost.google/course_templates/754/labs/461560" class="sky-blue-link"><h2>Creating a Virtual Machine</h2></a>
+
+    <div class="code-example">
+        <p>Execute 1: Enter the value of zone displayed on the lab page, after clicking on start, For example: ZONE=us-central1-a</p>
+        <div class="code-block">
+            <button class="copy-button">Copy code</button>
+            <pre><code>
+ZONE=    #write zone from the code
+            </code></pre>
+        </div>
+    </div>
+
+
+    <div class="code-example">
+        <p>Execute2: Copy Paste this code in the terminal</p>
+        <div class="code-block">
+            <button class="copy-button">Copy code</button>
+            <pre><code>
+gcloud auth list && gcloud config list project  
+gcloud config set compute/zone $ZONE
+gcloud compute firewall-rules create allow-http \
+  --allow tcp:80 \
+  --target-tags=http-server \
+  --description="Allow HTTP traffic" \
+  --direction=INGRESS
+gcloud compute instances create gcelab \
+  --machine-type=e2-medium \
+  --zone=$ZONE \
+  --tags=http-server \
+  --metadata=startup-script='#! /bin/bash
+    sudo apt-get update
+    sudo apt-get install -y nginx'
+yes | gcloud compute ssh gcelab --zone=$ZONE --command "
+  sudo apt-get update &&
+  sudo apt-get install -y nginx &&
+  ps auwx | grep nginx
+"
+gcloud compute instances create gcelab2 \
+--machine-type e2-medium --zone=$ZONE
+
+            </code></pre>
+        </div>
+    </div>
+
+
+</body>
+</html>

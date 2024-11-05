@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Display Example</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
+</head>
+<body>
+    <h1>The Basics of Google Cloud Compute</h1>
+    <a href="https://www.cloudskillsboost.google/course_sessions/19266958/labs/461563" class="sky-blue-link">
+        <h2>The Basics of Google Cloud Compute: Challenge Lab</h2>
+    </a>
+
+    <div class="code-example">
+        <p>Execute 1: Enter the value of zone displayed on the lab page, after clicking on start. For example: ZONE=us-central1-a</p>
+        <div class="code-block">
+            <button class="copy-button">Copy code</button>
+            <pre><code>ZONE=    # write zone from the code</code></pre>
+        </div>
+    </div>
+
+    <div class="code-example">
+        <p>Execute 2: Copy and paste this code in the terminal</p>
+        <div class="code-block">
+            <button class="copy-button">Copy code</button>
+            <pre><code>
+export REGION="${ZONE%-*}"
+gcloud auth list && gcloud config list project && \
+gcloud config set compute/region $REGION && gcloud config set compute/zone $ZONE
+export PROJECT_ID=$(gcloud config get-value project)
+
+
+gsutil mb -l US gs://$PROJECT_ID-bucket/
+
+curl -LO raw.githubusercontent.com/QUICK-GCP-LAB/2-Minutes-Labs-Solutions/main/The%20Basics%20of%20Google%20Cloud%20Compute%20Challenge%20Lab/arc120.sh
+
+sudo chmod +x arc120.sh
+
+./arc120.sh
+            </code></pre>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,106 @@
+/* General page styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+}
+
+/* Code example sections */
+.code-example {
+    margin-bottom: 20px;
+}
+
+/* Inline code styling */
+code {
+    background-color: #000;
+    padding: 2px 5px;
+    border-radius: 4px;
+    color: #c5c8c6;
+    font-family: "Courier New", Courier, monospace;
+}
+
+/* Code block styling */
+.code-block {
+    position: relative;
+    background-color: #000;
+    padding: 10px;
+    border-radius: 5px;
+    color: #c5c8c6;
+    font-family: "Courier New", Courier, monospace;
+    overflow-x: auto; /* Enable horizontal scrolling */
+}
+
+pre {
+    margin: 0;
+    white-space: pre-wrap; /* Allows line breaks within the pre element */
+    word-break: break-word; /* Ensures long words or URLs break appropriately */
+}
+
+/* Copy button styling */
+.copy-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #444;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.copy-button:hover {
+    background-color: #555;
+}
+
+/* Image placeholder section */
+.image-section {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.image-section h2 {
+    color: #fff;
+}
+
+.image-placeholder {
+    width: 100%;
+    max-width: 600px;
+    background-color: #222;
+    border: 2px solid #555;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Image styling */
+.image-placeholder img {
+    width: 100%;
+    height: auto; /* Maintain aspect ratio */
+    max-width: 100%;
+    border-radius: 8px;
+    object-fit: contain; /* Ensures the full image is displayed within the container */
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+    .image-placeholder {
+        max-width: 100%;
+        margin: 0 auto;
+    }
+    
+    .image-placeholder img {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+    }
+}
+
+
+.sky-blue-link {
+    color: skyblue;
+}

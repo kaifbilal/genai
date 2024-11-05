@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Display Example</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
+</head>
+<body>
+    <h1>Get Started with Cloud Storage</h1>
+    <a href="https://www.cloudskillsboost.google/course_templates/725/labs/461638" class="sky-blue-link"><h2>Google Cloud Storage - Bucket Lock </h2></a>
+
+    <div class="code-example">
+        <p>Execute 1: Enter the value of Region displayed on the lab page, after clicking on start, For example: REGION=us-central1</p>
+        <div class="code-block">
+            <button class="copy-button">Copy code</button>
+            <pre><code>
+REGION=    #write region from the code
+            </code></pre>
+        </div>
+    </div>
+
+
+    <div class="code-example">
+        <p>Execute2: Copy Paste this code in the terminal</p>
+        <div class="code-block">
+            <button class="copy-button">Copy code</button>
+            <pre><code>
+gcloud auth list && \
+gcloud config list project && \
+gcloud config set compute/region $REGION && \
+export BUCKET=$(gcloud config get-value project) && \
+gsutil mb "gs://$BUCKET" && \
+gsutil retention set 10s "gs://$BUCKET" && \
+gsutil retention get "gs://$BUCKET" && \
+gsutil cp gs://spls/gsp297/dummy_transactions "gs://$BUCKET/" && \
+gsutil ls -L "gs://$BUCKET/dummy_transactions" && \
+yes | gsutil retention lock "gs://$BUCKET/"
+            </code></pre>
+        </div>
+    </div>
+
+    <!-- Image Section with Placeholder -->
+    <div class="image-section">
+        <h2>Click on Check Box</h2>
+        <div class="image-placeholder">
+            <img id="dynamic-image" src="{{ url_for('static', filename='images/1.png') }}" alt="Image Placeholder">
+        </div>
+    </div>
+
+    <div class="code-example">
+       <p>Execute 3: Copy Paste this code in the terminal</p>
+        <div class="code-block">
+            <button class="copy-button">Copy code</button>
+            <pre><code>
+sleep 15
+gsutil retention temp set "gs://$BUCKET/dummy_transactions" && \
+gsutil rm "gs://$BUCKET/dummy_transactions"
+gsutil retention temp release "gs://$BUCKET/dummy_transactions" 
+            </code></pre>
+        </div>
+    </div>
+
+
+<!-- Image Section with Placeholder -->
+<div class="image-section">
+    <h2>Click on Check Box</h2>
+    <div class="image-placeholder">
+        <img id="dynamic-image" src="{{ url_for('static', filename='images/2.png') }}" alt="Image Placeholder">
+    </div>
+</div>
+
+    <div class="code-example">
+        <p>Execute 4: Copy Paste this code in the terminal</p>
+        <div class="code-block">
+            <button class="copy-button">Copy code</button>
+            <pre><code>
+gsutil rm "gs://$BUCKET/dummy_transactions" && \
+gsutil retention event-default set "gs://$BUCKET/" && \
+gsutil cp gs://spls/gsp297/dummy_loan "gs://$BUCKET/" && \
+gsutil ls -L "gs://$BUCKET/dummy_loan" && \
+gsutil retention event release "gs://$BUCKET/dummy_loan" && \
+gsutil ls -L "gs://$BUCKET/dummy_loan"
+            </code></pre>
+        </div>
+    </div>
+
+<!-- Image Section with Placeholder -->
+<div class="image-section">
+    <h2>Click on Check Box</h2>
+    <div class="image-placeholder">
+        <img id="dynamic-image" src="{{ url_for('static', filename='images/3.png') }}" alt="Image Placeholder">
+    </div>
+</div>
+
+
+</body>
+</html>

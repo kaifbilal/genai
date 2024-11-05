@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Display Example</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
+</head>
+<body>
+    <h1>Get Started with Cloud Storage</h1>
+    <a href="https://www.cloudskillsboost.google/course_templates/725/labs/461639" class="sky-blue-link"><h2>Get Started with Cloud Storage: Challenge Lab</h2></a>
+
+    <div class="code-example">
+        <p>[IF GIVEN] <br> Execute 1: Enter the value of Region displayed on the lab page, after clicking on start, For example: REGION=us-central1</p>
+        <div class="code-block">
+            <button class="copy-button">Copy code</button>
+            <pre><code>
+REGION=    #write region from the code
+            </code></pre>
+        </div>
+    </div>
+
+     <!-- Image Section with Placeholder -->
+     <div class="image-section">
+        <h2>Copy Bucket Name</h2>
+        <div class="image-placeholder">
+            <img id="dynamic-image" src="{{ url_for('static', filename='images/4.png') }}" alt="Image Placeholder">
+        </div>
+    </div>
+
+    <div class="code-example">
+        <p>Execute2: Enter the bucket name</p>
+        <div class="code-block">
+            <button class="copy-button">Copy code</button>
+            <pre><code>
+export BUCKET_1=
+export BUCKET_2=
+export BUCKET_3=
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="code-example">
+        <p>Execute3: Copy Paste this code in the terminal</p>
+        <div class="code-block">
+            <button class="copy-button">Copy code</button>
+            <pre><code>
+curl -LO raw.githubusercontent.com/QUICK-GCP-LAB/2-Minutes-Labs-Solutions/main/Get%20Started%20with%20Cloud%20Storage%20Challenge%20Lab/arc111.sh
+
+sudo chmod +x arc111.sh
+
+./arc111.sh
+            </code></pre>
+        </div>
+
+    <!-- Image Section with Placeholder -->
+    <div class="image-section">
+        <h2>Check the Form ID</h2>
+        <div class="image-placeholder">
+            <img id="dynamic-image" src="{{ url_for('static', filename='images/5.png') }}" alt="Image Placeholder">
+        </div>
+    </div>
+
+    <div class="image-section">
+        
+        <div class="image-placeholder">
+            <img id="dynamic-image" src="{{ url_for('static', filename='images/6.png') }}" alt="Image Placeholder">
+        </div>
+    </div>
+
+    <p>Enter the Form I'd in the terminal!</p>
+
+
+</body>
+</html>
