@@ -8,8 +8,14 @@
     <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
 </head>
 <body>
+    <h1>Cloud Speech API: 3 Ways</h1>
+    <a href="https://www.cloudskillsboost.google/course_templates/700/labs/461583"><h2>Cloud Speech API 3 Ways: Challenge Lab</h2></a>
     <div class="code-example">
-        <p>Here is some inline code: <code>let x = 5;</code></p>
+        <p> WATCH THE VIDEO!!
+
+            https://youtu.be/eQIWNzs-0NA?si=84vh7byZXZvRBXLl
+            
+        </p>
     </div>
 
     <div class="code-example">
@@ -17,9 +23,42 @@
         <div class="code-block">
             <button class="copy-button">Copy code</button>
             <pre><code>
-function greet() {
-    console.log("Hello, World!");
-}
+export ZONE=$(gcloud compute instances list lab-vm --format 'csv[no-heading](zone)')
+gcloud compute ssh lab-vm --project=$DEVSHELL_PROJECT_ID --zone=$ZONE --quiet
+                
+                
+                
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="code-example">
+        <p>To display blocks of code, you can combine <code>&lt;code&gt;</code> with the <code>&lt;pre&gt;</code> tag, which preserves whitespace and line breaks:</p>
+        <div class="code-block">
+            <button class="copy-button">Copy code</button>
+            <pre><code>
+export API_KEY=
+export task_2_file_name=""
+export task_3_request_file=""
+export task_3_response_file=""
+export task_4_sentence=""
+export task_4_file=""
+export task_5_sentence=""
+export task_5_file=""
+            </code></pre>
+        </div>
+    </div>
+
+    <div class="code-example">
+        <p>To display blocks of code, you can combine <code>&lt;code&gt;</code> with the <code>&lt;pre&gt;</code> tag, which preserves whitespace and line breaks:</p>
+        <div class="code-block">
+            <button class="copy-button">Copy code</button>
+            <pre><code>
+curl -LO raw.githubusercontent.com/QUICK-GCP-LAB/2-Minutes-Labs-Solutions/main/Cloud%20Speech%20API%203%20Ways%20Challenge%20Lab/arc132.sh
+
+sudo chmod +x arc132.sh
+
+./arc132.sh
             </code></pre>
         </div>
     </div>

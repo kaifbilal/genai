@@ -8,29 +8,185 @@
     <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
 </head>
 <body>
+<h1>Get Started with API Gateway</h1>
+<a href="https://www.cloudskillsboost.google/course_templates/662/labs/461584"><h2>API Gateway: Qwik Start</h2> </a>
     <div class="code-example">
-        <p>Here is some inline code: <code>let x = 5;</code></p>
-    </div>
-
-    <div class="code-example">
-        <p>To display blocks of code, you can combine <code>&lt;code&gt;</code> with the <code>&lt;pre&gt;</code> tag, which preserves whitespace and line breaks:</p>
+        <p>Copy and Paste Region</p>
         <div class="code-block">
             <button class="copy-button">Copy code</button>
             <pre><code>
-function greet() {
-    console.log("Hello, World!");
-}
+export REGION= #enter region without space
             </code></pre>
         </div>
     </div>
 
-    <!-- Image Section with Placeholder -->
-    <div class="image-section">
-        <h2>Image Placeholder</h2>
-        <div class="image-placeholder">
-            <img id="dynamic-image" src="https://letsenhance.io/static/73136da51c245e80edc6ccfe44888a99/6e61b/MainBefore.avif" alt="Image Placeholder">
+    <div class="code-example">
+        <p>Execute this code</p>
+        <div class="code-block">
+            <button class="copy-button">Copy code</button>
+            <pre><code>
+# Set the REGION variable and configure it for gcloud
+gcloud config set compute/region $REGION
+
+# Clone the GitHub repository
+git clone https://github.com/GoogleCloudPlatform/nodejs-docs-samples.git
+cd nodejs-docs-samples/functions/helloworld/helloworldGet
+
+# Deploy the Cloud Function
+gcloud functions deploy helloGET \
+    --runtime nodejs20 \
+    --trigger-http \
+    --allow-unauthenticated \
+    --region $REGION
+
+# Describe the deployed function
+gcloud functions describe helloGET --region $REGION
+
+# Set the PROJECT_ID variable
+export PROJECT_ID=$(gcloud config get-value project)
+
+# Test the Cloud Function
+curl -v https://$REGION-$PROJECT_ID.cloudfunctions.net/helloGET
+
+# Create the OpenAPI spec file
+cd ~
+touch openapi2-functions.yaml
+
+# Write the OpenAPI spec into the file
+cat &lt;&lt;EOF &gt; openapi2-functions.yaml
+swagger: '2.0'
+info:
+  title: API_ID description
+  description: Sample API on API Gateway with a Google Cloud Functions backend
+  version: 1.0.0
+schemes:
+  - https
+produces:
+  - application/json
+paths:
+  /hello:
+    get:
+      summary: Greet a user
+      operationId: hello
+      x-google-backend:
+        address: https://$REGION-$PROJECT_ID.cloudfunctions.net/helloGET
+      responses:
+       '200':
+          description: A successful response
+          schema:
+            type: string
+EOF
+
+# Generate a unique API ID
+export API_ID="hello-world-$(cat /dev/urandom | tr -dc 'a-z' | fold -w ${1:-8} | head -n 1)"
+
+# Replace placeholders in the OpenAPI spec
+sed -i "s/API_ID/${API_ID}/g" openapi2-functions.yaml
+sed -i "s/PROJECT_ID/$PROJECT_ID/g" openapi2-functions.yaml
+
+
+
+
+
+export API_ID="hello-world-$(cat /dev/urandom | tr -dc 'a-z' | fold -w ${1:-8} | head -n 1)"
+echo $API_ID
+
+# Create a new API
+gcloud api-gateway apis create $API_ID --display-name="Hello World API" --project=$PROJECT_ID
+
+# Create a new API config
+gcloud api-gateway api-configs create hello-world-config \
+    --api=$API_ID \
+    --openapi-spec=openapi2-functions.yaml \
+    --display-name="Hello World Config" \
+    --project=$PROJECT_ID
+
+# Create the Gateway
+gcloud api-gateway gateways create "hello-gateway" \
+    --api=$API_ID \
+    --api-config=hello-world-config \
+    --location=$REGION \
+    --display-name="Hello Gateway" \
+    --project=$PROJECT_ID
+
+
+gcloud alpha services api-keys create --display-name="awesome"  
+
+KEY_NAME=$(gcloud alpha services api-keys list --format="value(name)" --filter "displayName=awesome") 
+
+export API_KEY=$(gcloud alpha services api-keys get-key-string $KEY_NAME --format="value(keyString)") 
+
+echo $API_KEY
+
+# Fetch the managed service and enable it
+MANAGED_SERVICE=$(gcloud api-gateway apis list --format json | jq -r .[0].managedService | cut -d'/' -f6)
+echo $MANAGED_SERVICE
+gcloud services enable $MANAGED_SERVICE
+
+# Create the second OpenAPI spec file (openapi2-functions2.yaml)
+touch openapi2-functions2.yaml
+
+# Write the OpenAPI spec into the file
+cat &lt;&lt;EOF &gt; openapi2-functions2.yaml
+swagger: '2.0'
+info:
+  title: API_ID description
+  description: Sample API on API Gateway with a Google Cloud Functions backend
+  version: 1.0.0
+schemes:
+  - https
+produces:
+  - application/json
+paths:
+  /hello:
+    get:
+      summary: Greet a user
+      operationId: hello
+      x-google-backend:
+        address: https://$REGION-$PROJECT_ID.cloudfunctions.net/helloGET
+      security:
+        - api_key: []
+      responses:
+       '200':
+          description: A successful response
+          schema:
+            type: string
+securityDefinitions:
+  api_key:
+    type: "apiKey"
+    name: "key"
+    in: "query"
+EOF
+
+# Replace placeholders in the second OpenAPI spec
+sed -i "s/API_ID/${API_ID}/g" openapi2-functions2.yaml
+sed -i "s/PROJECT_ID/$PROJECT_ID/g" openapi2-functions2.yaml
+
+gcloud api-gateway api-configs create hello-config \
+    --api=$API_ID \
+    --openapi-spec=openapi2-functions2.yaml \
+    --display-name="Hello Config" \
+    --project=$PROJECT_ID \
+    --backend-auth-service-account=$PROJECT_ID@$PROJECT_ID.iam.gserviceaccount.com
+gcloud api-gateway gateways update hello-gateway --location=$REGION --project=$PROJECT_ID --api=$API_ID --api-config=hello-config
+
+gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$PROJECT_ID@$PROJECT_ID.iam.gserviceaccount.com" --role="roles/serviceusage.serviceUsageAdmin"
+
+gcloud projects add-iam-policy-binding $PROJECT_ID --member="serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com" --role="roles/serviceusage.serviceUsageAdmin"
+
+
+MANAGED_SERVICE=$(gcloud api-gateway apis list --format json | jq -r --arg api_id "$API_ID" '.[] | select(.name | endswith($api_id)) | .managedService' | cut -d'/' -f6)
+echo $MANAGED_SERVICE
+
+gcloud services enable $MANAGED_SERVICE	
+
+export GATEWAY_URL=$(gcloud api-gateway gateways describe hello-gateway --location $REGION --format json | jq -r .defaultHostname)
+curl -sL -w "\n" $GATEWAY_URL/hello?key=$API_KEY
+
+            </code></pre>
         </div>
     </div>
+
 
 </body>
 </html>

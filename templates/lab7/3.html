@@ -8,29 +8,478 @@
     <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
 </head>
 <body>
-    <div class="code-example">
-        <p>Here is some inline code: <code>let x = 5;</code></p>
-    </div>
-
-    <div class="code-example">
-        <p>To display blocks of code, you can combine <code>&lt;code&gt;</code> with the <code>&lt;pre&gt;</code> tag, which preserves whitespace and line breaks:</p>
-        <div class="code-block">
+  <h1>Cloud Functions: 3 Ways</h1>
+  <a href="https://www.cloudskillsboost.google/course_templates/696/labs/461618"><h2> Cloud Functions 2nd Gen: Qwik Start </h2> </a>
+  
+      
+      <div class="code-example">
+          <div class="code-block">
+              <button class="copy-button">Copy code</button>
+              <pre><code>
+  export ZONE=
+              </code></pre>
+          </div>
+      </div>
+  
+      <div class="code-example">
+         <p>Execute this code</p><div class="code-block">
             <button class="copy-button">Copy code</button>
             <pre><code>
-function greet() {
-    console.log("Hello, World!");
+export REGION="${ZONE%-*}"
+
+gcloud auth list
+gcloud config list project
+export PROJECT_ID=$(gcloud config get-value project)
+export REGION=$REGION
+gcloud config set compute/region $REGION
+gcloud config set compute/zone $ZONE
+gcloud services enable \
+  artifactregistry.googleapis.com \
+  cloudfunctions.googleapis.com \
+  cloudbuild.googleapis.com \
+  eventarc.googleapis.com \
+  run.googleapis.com \
+  logging.googleapis.com \
+  pubsub.googleapis.com
+
+SERVICES=(
+  "artifactregistry.googleapis.com"
+  "cloudfunctions.googleapis.com"
+  "cloudbuild.googleapis.com"
+  "eventarc.googleapis.com"
+  "run.googleapis.com"
+  "logging.googleapis.com"
+  "pubsub.googleapis.com"
+)
+
+# Check if services are enabled
+check_services() {
+  for service in "${SERVICES[@]}"; do
+    STATUS=$(gcloud services list --enabled --filter="NAME:$service" --format="value(NAME)")
+    if [[ -z $STATUS ]]; then
+      return 1 # Service not enabled, return failure
+    fi
+  done
+  return 0 # All services are enabled, return success
 }
+
+# Loop until all services are enabled
+while true; do
+  check_services
+  if [[ $? -eq 0 ]]; then
+    echo "All required services are enabled. Proceeding to the next command..."
+    break
+  else
+    echo "Waiting for services to be enabled... Sleeping for 10 seconds."
+    sleep 10
+  fi
+done
+
+# Place the next commands after the loop
+echo "Proceeding with the next steps..."
+
+
+
+mkdir ~/hello-http && cd ~/hello-http
+echo "const functions = require('@google-cloud/functions-framework');
+
+functions.http('helloWorld', (req, res) => {
+  res.status(200).send('HTTP with Node.js in GCF 2nd gen!');
+});" > index.js
+
+echo '{
+  "name": "nodejs-functions-gen2-codelab",
+  "version": "0.0.1",
+  "main": "index.js",
+  "dependencies": {
+    "@google-cloud/functions-framework": "^2.0.0"
+  }
+}' > package.json
+
+gcloud functions deploy nodejs-http-function \
+  --gen2 \
+  --runtime nodejs18 \
+  --entry-point helloWorld \
+  --source . \
+  --region $REGION \
+  --trigger-http \
+  --timeout 600s \
+  --max-instances 1
+gcloud functions call nodejs-http-function \
+  --gen2 --region $REGION
+
+
+CHECK BOX 1
+
+EXECUTE 2:
+# Set the environment variables
+export PROJECT_ID=$(gcloud config get-value project)
+export PROJECT_NUMBER=$(gcloud projects list --filter="project_id:$PROJECT_ID" --format='value(project_number)')
+export SERVICE_ACCOUNT=$(gsutil kms serviceaccount -p $PROJECT_NUMBER)
+
+# Grant the Pub/Sub Publisher role to the service account
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member "serviceAccount:$SERVICE_ACCOUNT" \
+  --role "roles/pubsub.publisher"
+
+# Create directory and files for the Cloud Function
+mkdir ~/hello-storage && cd ~/hello-storage
+
+# Create index.js with the exact content
+cat &LT;&LT; EOF &GT; index.js
+const functions = require('@google-cloud/functions-framework');
+
+functions.cloudEvent('helloStorage', (cloudevent) => {
+  console.log('Cloud Storage event with Node.js in GCF 2nd gen!');
+  console.log(cloudevent);
+});
+EOF
+
+# Create package.json with the exact content
+cat &lt;&lt;EOF &gt; package.json
+{
+  "name": "nodejs-functions-gen2-codelab",
+  "version": "0.0.1",
+  "main": "index.js",
+  "dependencies": {
+    "@google-cloud/functions-framework": "^2.0.0"
+  }
+}
+EOF
+
+# Create a Cloud Storage bucket
+BUCKET="gcf-gen2-storage-$PROJECT_ID"
+gsutil mb -l $REGION gs://$BUCKET
+
+
+# Deploy the Cloud Function
+gcloud functions deploy nodejs-storage-function \
+  --gen2 \
+  --runtime nodejs18 \
+  --entry-point helloStorage \
+  --source . \
+  --region=$REGION \
+  --trigger-bucket $BUCKET \
+  --max-instances 1
+
+# Upload a file to the bucket to trigger the function
+echo "Hello World" > random.txt
+gsutil cp random.txt gs://$BUCKET/random.txt
+
+# Read Cloud Function logs
+gcloud functions logs read nodejs-storage-function \
+  --region $REGION --gen2 --limit=100 --format "value(log)"
+
+
+CHECK BOX 2
+
+
+
+
+EXCUTE 3
+# Set environment variables
+export PROJECT_ID=$(gcloud config get-value project)
+PROJECT_NUMBER=$(gcloud projects list --filter="project_id:$PROJECT_ID" --format='value(project_number)')
+
+# Enable Compute Engine API
+gcloud services enable compute.googleapis.com --project=$PROJECT_ID
+
+# Enable logging for Compute Engine
+gcloud logging sinks create compute-logs \
+  "bigquery.googleapis.com/projects/$PROJECT_ID/datasets/compute-logs" \
+  --log-filter='resource.type="gce_instance"' \
+  --project=$PROJECT_ID
+
+# Create the BigQuery dataset for logs
+bq mk --dataset compute-logs
+
+# Grant permissions to the logging service account for BigQuery
+LOGGING_SERVICE_ACCOUNT="service-${PROJECT_NUMBER}@gcp-sa-logging.iam.gserviceaccount.com"
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member serviceAccount:$LOGGING_SERVICE_ACCOUNT \
+  --role roles/bigquery.dataEditor 
+
+echo "Compute Engine API logging is enabled with Admin Read, Data Read, and Data Write log types." 
+
+# Grant the necessary IAM roles to the logging service account for Eventarc
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com \
+  --role roles/eventarc.eventReceiver 
+
+# Clone the Eventarc samples repository
+cd ~
+git clone https://github.com/GoogleCloudPlatform/eventarc-samples.git
+
+# Deploy the Cloud Function for the GCE VM labeler
+cd ~/eventarc-samples/gce-vm-labeler/gcf/nodejs
+gcloud functions deploy gce-vm-labeler \
+  --gen2 \
+  --runtime nodejs18 \
+  --entry-point labelVmCreation \
+  --source . \
+  --region $REGION \
+  --trigger-event-filters="type=google.cloud.audit.log.v1.written,serviceName=compute.googleapis.com,methodName=beta.compute.instances.insert" \
+  --trigger-location $REGION \
+  --max-instances 1
+
+# Create a Compute Engine instance
+gcloud compute instances create instance-1 --zone $ZONE
+
+# Describe the created instance
+gcloud compute instances describe instance-1 --zone $ZONE
+
+
+
+CHECK BOX 3 AND 4
+
+
+
+
+EXECUTE 2:
+# Set the environment variables
+export PROJECT_ID=$(gcloud config get-value project)
+export PROJECT_NUMBER=$(gcloud projects list --filter="project_id:$PROJECT_ID" --format='value(project_number)')
+export SERVICE_ACCOUNT=$(gsutil kms serviceaccount -p $PROJECT_NUMBER)
+
+# Grant the Pub/Sub Publisher role to the service account
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member "serviceAccount:$SERVICE_ACCOUNT" \
+  --role "roles/pubsub.publisher"
+
+# Create directory and files for the Cloud Function
+mkdir ~/hello-storage && cd ~/hello-storage
+
+# Create index.js with the exact content
+cat &lt;&lt;EOF &gt; index.js
+const functions = require('@google-cloud/functions-framework');
+
+functions.cloudEvent('helloStorage', (cloudevent) => {
+  console.log('Cloud Storage event with Node.js in GCF 2nd gen!');
+  console.log(cloudevent);
+});
+EOF
+
+# Create package.json with the exact content
+cat &lt;&lt;EOF &gt; package.json
+{
+  "name": "nodejs-functions-gen2-codelab",
+  "version": "0.0.1",
+  "main": "index.js",
+  "dependencies": {
+    "@google-cloud/functions-framework": "^2.0.0"
+  }
+}
+EOF
+
+# Create a Cloud Storage bucket
+BUCKET="gcf-gen2-storage-$PROJECT_ID"
+gsutil mb -l $REGION gs://$BUCKET
+
+
+# Deploy the Cloud Function
+gcloud functions deploy nodejs-storage-function \
+  --gen2 \
+  --runtime nodejs18 \
+  --entry-point helloStorage \
+  --source . \
+  --region=$REGION \
+  --trigger-bucket $BUCKET \
+  --max-instances 1
+
+# Upload a file to the bucket to trigger the function
+echo "Hello World" > random.txt
+gsutil cp random.txt gs://$BUCKET/random.txt
+
+# Read Cloud Function logs
+gcloud functions logs read nodejs-storage-function \
+  --region $REGION --gen2 --limit=100 --format "value(log)"
+
+
+# Set environment variables
+export PROJECT_ID=$(gcloud config get-value project)
+PROJECT_NUMBER=$(gcloud projects list --filter="project_id:$PROJECT_ID" --format='value(project_number)')
+
+# Enable Compute Engine API
+gcloud services enable compute.googleapis.com --project=$PROJECT_ID
+
+# Enable logging for Compute Engine
+gcloud logging sinks create compute-logs \
+  "bigquery.googleapis.com/projects/$PROJECT_ID/datasets/compute-logs" \
+  --log-filter='resource.type="gce_instance"' \
+  --project=$PROJECT_ID
+
+# Create the BigQuery dataset for logs
+bq mk --dataset compute-logs
+
+# Grant permissions to the logging service account for BigQuery
+LOGGING_SERVICE_ACCOUNT="service-${PROJECT_NUMBER}@gcp-sa-logging.iam.gserviceaccount.com"
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member serviceAccount:$LOGGING_SERVICE_ACCOUNT \
+  --role roles/bigquery.dataEditor 
+
+echo "Compute Engine API logging is enabled with Admin Read, Data Read, and Data Write log types." 
+
+# Grant the necessary IAM roles to the logging service account for Eventarc
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member serviceAccount:$PROJECT_NUMBER-compute@developer.gserviceaccount.com \
+  --role roles/eventarc.eventReceiver 
+
+# Clone the Eventarc samples repository
+cd ~
+git clone https://github.com/GoogleCloudPlatform/eventarc-samples.git
+
+# Deploy the Cloud Function for the GCE VM labeler
+cd ~/eventarc-samples/gce-vm-labeler/gcf/nodejs
+gcloud functions deploy gce-vm-labeler \
+  --gen2 \
+  --runtime nodejs18 \
+  --entry-point labelVmCreation \
+  --source . \
+  --region $REGION \
+  --trigger-event-filters="type=google.cloud.audit.log.v1.written,serviceName=compute.googleapis.com,methodName=beta.compute.instances.insert" \
+  --trigger-location $REGION \
+  --max-instances 1
+
+# Create a Compute Engine instance
+gcloud compute instances create instance-1 --zone $ZONE
+
+# Describe the created instance
+gcloud compute instances describe instance-1 --zone $ZONE
+
+
+
+
+
+
+EXECUTE 4
+
+COLOR="yellow"  # Specify the color for the function
+
+
+# Create the directory structure and files for the Cloud Function
+mkdir ~/hello-world-colored && cd ~/hello-world-colored
+
+# Add the Python code to the main.py file
+echo "import os
+
+color = os.environ.get('COLOR')
+
+def hello_world(request):
+    return f'&lt;body style=\"background-color:{{color}}\"&gt;&lt;h1&gt;Hello World!&lt;/h1&gt;&lt;/body&gt;'" > main.py
+
+# Create an empty requirements.txt file
+touch requirements.txt
+
+# Deploy the Cloud Function
+gcloud functions deploy hello-world-colored \
+  --gen2 \
+  --runtime python39 \
+  --entry-point hello_world \
+  --source . \
+  --region $REGION \
+  --trigger-http \
+  --allow-unauthenticated \
+  --update-env-vars COLOR=$COLOR \
+  --max-instances 1
+
+ CHECK BOX 5
+
+
+EXECUTE 5
+
+# Step 1: Create a directory and navigate into it
+mkdir ~/min-instances && cd ~/min-instances
+
+# Step 2: Create the Go files
+# Create and add content to main.go
+cat &lt;&lt;EOF &gt; main.go
+package p
+
+import (
+        "fmt"
+        "net/http"
+        "time"
+)
+
+func init() {
+        time.Sleep(10 * time.Second)
+}
+
+func HelloWorld(w http.ResponseWriter, r *http.Request) {
+        fmt.Fprint(w, "Slow HTTP Go in GCF 2nd gen!")
+}
+EOF
+
+# Create and add content to go.mod
+cat &lt;&lt;EOF &gt; go.mod
+module example.com/mod
+
+go 1.16
+EOF
+
+# Deploy the Cloud Function
+gcloud functions deploy slow-function \
+  --gen2 \
+  --runtime go116 \
+  --entry-point HelloWorld \
+  --source . \
+  --region $REGION \
+  --trigger-http \
+  --allow-unauthenticated \
+  --max-instances 4
+
+# Step 4: Call the Cloud Function to test it
+
+gcloud functions call slow-function --gen2 --region $REGION
+
+
+gcloud run deploy slow-function \
+--image=$REGION-docker.pkg.dev/$DEVSHELL_PROJECT_ID/gcf-artifacts/slow--function:version_1 \
+--min-instances=1 \
+--max-instances=4 \
+--region=$REGION \
+--project=$DEVSHELL_PROJECT_ID
+
+
+SLOW_URL=$(gcloud functions describe slow-function --region $REGION --gen2 --format="value(serviceConfig.uri)")
+hey -n 10 -c 10 $SLOW_URL
+
+gcloud functions deploy slow-concurrent-function \
+  --gen2 \
+  --runtime go116 \
+  --entry-point HelloWorld \
+  --source . \
+  --region $REGION \
+  --trigger-http \
+  --allow-unauthenticated \
+  --min-instances 1 \
+  --max-instances 4
+
+gcloud run deploy slow-concurrent-function \
+--image=$REGION-docker.pkg.dev/$DEVSHELL_PROJECT_ID/gcf-artifacts/slow--concurrent--function:version_1 \
+--concurrency=100 \
+--cpu=1 \
+--max-instances=4 \
+--region=$REGION \
+--project=$DEVSHELL_PROJECT_ID \
+ && gcloud run services update-traffic slow-concurrent-function --to-latest --region=$REGION
+
+# Retrieve the URL of the slow-concurrent-function and store it in SLOW_CONCURRENT_URL
+SLOW_CONCURRENT_URL=$(gcloud functions describe slow-concurrent-function --region $REGION --gen2 --format="value(serviceConfig.uri)")
+
+# Use hey to send 10 requests in total, with a concurrency level of 10
+hey -n 10 -c 10 "$SLOW_CONCURRENT_URL"
+
+
+
+
+
+
+echo "${CYAN}${BOLD}Click here and DEPLOY: "${RESET}""${BLUE}${BOLD}"https://console.cloud.google.com/run/deploy/$REGION/slow-concurrent-function?project=$DEVSHELL_PROJECT_ID""${RESET}"
+
+
             </code></pre>
         </div>
     </div>
-
-    <!-- Image Section with Placeholder -->
-    <div class="image-section">
-        <h2>Image Placeholder</h2>
-        <div class="image-placeholder">
-            <img id="dynamic-image" src="https://letsenhance.io/static/73136da51c245e80edc6ccfe44888a99/6e61b/MainBefore.avif" alt="Image Placeholder">
-        </div>
-    </div>
-
 </body>
 </html>

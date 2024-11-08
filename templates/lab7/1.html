@@ -8,29 +8,30 @@
     <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
 </head>
 <body>
-    <div class="code-example">
-        <p>Here is some inline code: <code>let x = 5;</code></p>
-    </div>
-
-    <div class="code-example">
-        <p>To display blocks of code, you can combine <code>&lt;code&gt;</code> with the <code>&lt;pre&gt;</code> tag, which preserves whitespace and line breaks:</p>
-        <div class="code-block">
+    <h1>Cloud Functions: 3 Ways</h1>
+    <a href="https://www.cloudskillsboost.google/course_templates/696/labs/461616"><h2>Cloud Run Functions: Qwik Start - Console  </h2> </a>
+    
+        
+        <div class="code-example">
+            <div class="code-block">
+                <button class="copy-button">Copy code</button>
+                <pre><code>
+    export REGION=
+                </code></pre>
+            </div>
+        </div>
+    
+        <div class="code-example">
+           <p>Execute this code</p><div class="code-block">
             <button class="copy-button">Copy code</button>
             <pre><code>
-function greet() {
-    console.log("Hello, World!");
-}
+curl -LO raw.githubusercontent.com/QUICK-GCP-LAB/2-Minutes-Labs-Solutions/main/Cloud%20Functions%20Qwik%20Start%20-%20Console/gsp081.sh
+
+sudo chmod +x gsp081.sh
+
+./gsp081.sh
             </code></pre>
         </div>
     </div>
-
-    <!-- Image Section with Placeholder -->
-    <div class="image-section">
-        <h2>Image Placeholder</h2>
-        <div class="image-placeholder">
-            <img id="dynamic-image" src="https://letsenhance.io/static/73136da51c245e80edc6ccfe44888a99/6e61b/MainBefore.avif" alt="Image Placeholder">
-        </div>
-    </div>
-
 </body>
 </html>

@@ -8,8 +8,15 @@
     <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
 </head>
 <body>
+    <h1>Cloud Speech API: 3 Ways</h1>
+    <a href="https://www.cloudskillsboost.google/course_templates/700/labs/461580"><h2>It Speaks! Create Synthetic Speech Using Text-to-Speech</h2></a>
     <div class="code-example">
-        <p>Here is some inline code: <code>let x = 5;</code></p>
+        <div class="code-block">
+            <button class="copy-button">Copy code</button>
+            <pre><code>
+export REGION= #WRITE REGION
+            </code></pre>
+        </div>
     </div>
 
     <div class="code-example">
@@ -17,20 +24,13 @@
         <div class="code-block">
             <button class="copy-button">Copy code</button>
             <pre><code>
-function greet() {
-    console.log("Hello, World!");
-}
+curl -LO raw.githubusercontent.com/QUICK-GCP-LAB/2-Minutes-Labs-Solutions/main/It%20Speaks%20Create%20Synthetic%20Speech%20Using%20Text%20to%20Speech/gsp222.sh
+
+sudo chmod +x gsp222.sh
+
+./gsp222.sh
             </code></pre>
         </div>
     </div>
-
-    <!-- Image Section with Placeholder -->
-    <div class="image-section">
-        <h2>Image Placeholder</h2>
-        <div class="image-placeholder">
-            <img id="dynamic-image" src="https://letsenhance.io/static/73136da51c245e80edc6ccfe44888a99/6e61b/MainBefore.avif" alt="Image Placeholder">
-        </div>
-    </div>
-
 </body>
 </html>
